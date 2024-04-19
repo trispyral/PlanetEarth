@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<!--
+
+    Amethyst WebRelease page
+    © 2022-2024 Anderson Bucchianico. All rights reserved.
+
+ -->
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0"
+        >
+        <title>Game page</title>
+    </head>
+
+    <body>
+        <canvas class="emscripten" id="canvas">
+			Sorry, Your browser is not supported.
+		</canvas>
+        <article>
+            <div>
+                <section>
+                    <img src="media/logo.png" alt="logo"/>
+                </section>
+                <section>
+                    <span>PlanetEarth</span>
+                    <span>2024</span>
+                </section>
+            </div>
+            <button class="element" onclick="initialize();">Play</button>
+        </article>
+    </body>
+
+    <script>
+        async function initialize() {
+            Module = {
+                print: (function() {
+                    return function(text) {
+                        if (text.includes("ERRR")) {
+                            console.error(text);
+                        } else
+                        if (text.includes("WARN")) {
+                            console.warn(text);
+                        } else {
+                            console.info(text);
+                        }
+                    };
+                })(),
+                canvas: (function() {
+                    return document.getElementById('canvas');
+                })()
+            };
+            Module.arguments = [
+                `-ww${window.innerWidth}`,
+                `-wh${window.innerHeight}`,
+                `-dv${window.platform}`
+            ];
+            document.querySelector("article").remove();
+
+            let script = document.createElement("script");
+            script.text = scriptGlue;
+            document.body.appendChild(script);
+        }
+        async function fetchContentWithPath(path) {
+            let response = await fetch(path);
+            if (response.status == 200 || response.statusText == 'OK') {
+                scriptGlue = await response.text();
+            } else {
+                return `[ERROR] code ${response.status}: ${response.statusText}`;
+            }
+        }
+        
+        let scriptGlue;
+        fetchContentWithPath("./index.js");        
+    </script>
+		
+	<style>
+		* {
+		    color: white;
+		    font-family: OpenSans, Arial, Helvetica, sans-serif;
+		    --theme-color: #4fc08a;
+		    --theme-background: #bdbdbd;
+		}
+		html {
+		    height : 100%;
+		}
+		body {
+		    height: inherit;
+		    margin: 0;
+		    background: radial-gradient(white, var(--theme-background));
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
+		canvas#canvas {
+		    height: 100%;
+		    width: 100%;
+		}
+		article {
+		    position: absolute;
+		    background-color: white;
+		    border-radius: 1vh;
+		    padding: 2vh;
+		    display: grid;
+		    justify-items: center;
+		    box-shadow: 2px 2px 6px #bcbcbc;
+		}
+		div {
+		    display: flex;
+		    column-gap: 1rem;
+		    margin-bottom: 1.5rem;
+		}
+		section {
+		    display: grid;
+		    align-items: end;
+		    align-content: space-evenly;
+		}
+		button {
+		    height: 5vh;
+		    width: 14vh;
+		    border-radius: 1vh;
+		    border: none;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    cursor: pointer;
+		    font-weight: bold;
+		    font-size: 16pt;
+		    color: white;
+		    background-color: var(--theme-color);
+		    box-shadow: 4px 4px #3b946a;
+		}
+		button:active {
+		    box-shadow: 2px 2px #3b946a;
+		}
+		button::after {
+		    content: '';
+		    background: linear-gradient(45deg, white 50%, transparent 50%);
+		    transform: scaleX(1.5) rotate(225deg);
+		    display: block;
+		    width: 1vh;
+		    height: 1vh;
+		}
+		span {
+		    color: #555555;
+		    font-weight: bold;
+		    font-size: 16pt;
+		}
+		img {
+		    height: 10vh;
+		}
+	</style>
+</html>
